@@ -1,0 +1,2 @@
+# sanriodle
+Sanrio Wordle Game
