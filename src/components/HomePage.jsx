@@ -23,6 +23,13 @@ export default function HomePage({ dateKey, onPlay }) {
           <p className="text-sm text-rose-500">{String.fromCodePoint(0x2728)} a new character every day {String.fromCodePoint(0x2728)}</p>
           <h1 className="mt-2 text-5xl sm:text-6xl font-black tracking-tight text-rose-500">Sanriodle</h1>
           <p className="mt-3 text-base sm:text-lg text-rose-700 font-semibold">Guess today&apos;s Sanriodle!</p>
+          <p className="mt-2 text-sm sm:text-base text-rose-700">
+            Sanriodle is a daily guessing game where you try to find the hidden Sanrio character.
+          </p>
+          <p className="mt-2 text-sm text-rose-600 leading-relaxed">
+            How to Play: Enter a character guess, then use each row of hints for species, color, franchise, and year
+            direction to narrow down the answer.
+          </p>
 
           <div className="mt-5 rounded-3xl border border-rose-100 bg-lavender/50 px-4 py-3">
             <p className="text-sm text-rose-600">{formatToday(dateKey)}</p>
