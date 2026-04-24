@@ -5,13 +5,7 @@ import Modal from "./Modal";
 const MAX_GUESSES = 8;
 
 const cellBase =
-  "rounded-2xl px-2.5 sm:px-3 py-2.5 text-xs sm:text-sm border shadow-sm min-h-14 flex items-center justify-center text-center";
-
-// Shared board layout: header and data rows must stay aligned.
-// Each column has an explicit min width to prevent mobile squishing.
-const boardGridCols =
-  "grid-cols-[minmax(190px,2fr)_minmax(110px,1fr)_minmax(120px,1fr)_minmax(140px,1fr)_minmax(110px,1fr)_minmax(150px,1.15fr)]";
-const boardGridBase = `grid ${boardGridCols} gap-2 sm:gap-2.5`;
+  "rounded-2xl px-2.5 sm:px-3 py-2 text-xs sm:text-sm border shadow-sm min-h-14 flex items-center justify-center text-center";
 
 function ImageThumb({ src, alt, size = "md" }) {
   const [failed, setFailed] = useState(false);
@@ -292,50 +286,48 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
         </section>
 
         <section className="overflow-x-auto rounded-3xl border border-white bg-white/80 shadow-soft p-2.5 sm:p-4">
-          <div className="min-w-[840px] w-max">
-            <div className={`${boardGridBase} mb-2 text-[11px] sm:text-xs font-bold uppercase tracking-wide text-rose-500`}>
-              <div className="px-2">Character</div>
-              <div className="px-2">Gender</div>
-              <div className="px-2">Species</div>
-              <div className="px-2">Release Year</div>
-              <div className="px-2">Color</div>
-              <div className="px-2">Franchise</div>
-            </div>
+          <div className="min-w-[690px] sm:min-w-[760px] grid grid-cols-6 gap-1.5 sm:gap-2 mb-2 text-[11px] sm:text-xs font-bold uppercase tracking-wide text-rose-500">
+            <div className="px-2">Character</div>
+            <div className="px-2">Gender</div>
+            <div className="px-2">Species</div>
+            <div className="px-2">Release Year</div>
+            <div className="px-2">Color</div>
+            <div className="px-2">Franchise</div>
+          </div>
 
-            <div className="space-y-2 sm:space-y-2.5">
-              {guesses.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-rose-200 bg-cream px-4 py-6 text-center text-sm text-rose-500">
-                  Your guess history will appear here. Start with your cutest guess!
-                </div>
-              ) : (
-                guesses.map((entry, index) => (
-                  <div
-                    key={`${entry.character.id}-${index}`}
-                    className={`${boardGridBase} animate-fade-in`}
-                    style={{ animationDelay: `${index * 80}ms` }}
-                  >
-                    <div className={`${cellBase} ${toneClass(entry.result.name)} justify-start gap-2 sm:gap-2.5`}>
-                      <ImageThumb src={entry.character.image} alt={entry.character.name} size="sm" />
-                      <span className="font-semibold text-left leading-tight truncate">{entry.character.name}</span>
-                    </div>
-                    <div className={`${cellBase} ${toneClass(entry.result.gender)}`}>{toDisplayLabel(entry.character.gender)}</div>
-                    <div className={`${cellBase} ${toneClass(entry.result.species)}`}>{toDisplayLabel(entry.character.species)}</div>
-                    <div className={`${cellBase} ${toneClass(entry.result.releaseYear)}`}>
-                      <span className="font-semibold">{entry.character.releaseYear}</span>
-                      {entry.result.releaseHint !== "match" ? (
-                        <span className="ml-1 text-xs">{entry.result.releaseHint === "older" ? "\u2191 newer" : "\u2193 older"}</span>
-                      ) : null}
-                    </div>
-                    <div className={`${cellBase} ${toneClass(entry.result.signatureColor)}`}>
-                      {toDisplayLabel(entry.character.signatureColor)}
-                    </div>
-                    <div className={`${cellBase} ${toneClass(entry.result.franchiseGroup)}`}>
-                      {toDisplayLabel(entry.character.franchiseGroup)}
-                    </div>
+          <div className="space-y-1.5 sm:space-y-2">
+            {guesses.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-rose-200 bg-cream px-4 py-6 text-center text-sm text-rose-500">
+                Your guess history will appear here. Start with your cutest guess!
+              </div>
+            ) : (
+              guesses.map((entry, index) => (
+                <div
+                  key={`${entry.character.id}-${index}`}
+                  className="grid grid-cols-6 gap-1.5 sm:gap-2 animate-fade-in"
+                  style={{ animationDelay: `${index * 80}ms` }}
+                >
+                  <div className={`${cellBase} ${toneClass(entry.result.name)} justify-start gap-2 sm:gap-2.5`}>
+                    <ImageThumb src={entry.character.image} alt={entry.character.name} size="sm" />
+                    <span className="font-semibold text-left leading-tight truncate">{entry.character.name}</span>
                   </div>
-                ))
-              )}
-            </div>
+                  <div className={`${cellBase} ${toneClass(entry.result.gender)}`}>{toDisplayLabel(entry.character.gender)}</div>
+                  <div className={`${cellBase} ${toneClass(entry.result.species)}`}>{toDisplayLabel(entry.character.species)}</div>
+                  <div className={`${cellBase} ${toneClass(entry.result.releaseYear)}`}>
+                    <span className="font-semibold">{entry.character.releaseYear}</span>
+                    {entry.result.releaseHint !== "match" ? (
+                      <span className="ml-1 text-xs">{entry.result.releaseHint === "older" ? "\u2191 newer" : "\u2193 older"}</span>
+                    ) : null}
+                  </div>
+                  <div className={`${cellBase} ${toneClass(entry.result.signatureColor)}`}>
+                    {toDisplayLabel(entry.character.signatureColor)}
+                  </div>
+                  <div className={`${cellBase} ${toneClass(entry.result.franchiseGroup)}`}>
+                    {toDisplayLabel(entry.character.franchiseGroup)}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </section>
 
