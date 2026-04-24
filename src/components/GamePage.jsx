@@ -62,6 +62,61 @@ function toDisplayLabel(value) {
     .join(" ");
 }
 
+function MobileAttributePill({ label, value, tone, hint }) {
+  return (
+    <div className={`rounded-2xl border px-3 py-2 ${tone}`}>
+      <p className="text-[11px] uppercase tracking-wide opacity-80">{label}</p>
+      <p className="text-sm font-semibold leading-tight">
+        {value}
+        {hint ? <span className="ml-1 text-xs font-medium">{hint}</span> : null}
+      </p>
+    </div>
+  );
+}
+
+function MobileGuessCard({ entry }) {
+  return (
+    <article className="rounded-3xl border border-white bg-white/80 shadow-soft p-3.5 animate-fade-in">
+      <div className={`rounded-2xl border px-3 py-2.5 mb-3 flex items-center gap-2.5 ${toneClass(entry.result.name)}`}>
+        <ImageThumb src={entry.character.image} alt={entry.character.name} size="sm" />
+        <p className="font-semibold text-sm leading-tight">{entry.character.name}</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2.5">
+        <MobileAttributePill
+          label="Gender"
+          value={toDisplayLabel(entry.character.gender)}
+          tone={toneClass(entry.result.gender)}
+        />
+        <MobileAttributePill
+          label="Species"
+          value={toDisplayLabel(entry.character.species)}
+          tone={toneClass(entry.result.species)}
+        />
+        <MobileAttributePill
+          label="Release Year"
+          value={entry.character.releaseYear}
+          hint={entry.result.releaseHint === "match" ? "" : entry.result.releaseHint === "older" ? "\u2191 newer" : "\u2193 older"}
+          tone={toneClass(entry.result.releaseYear)}
+        />
+        <MobileAttributePill
+          label="Color"
+          value={toDisplayLabel(entry.character.signatureColor)}
+          tone={toneClass(entry.result.signatureColor)}
+        />
+      </div>
+
+      <div className="mt-2.5">
+        <MobileAttributePill
+          label="Franchise"
+          value={toDisplayLabel(entry.character.franchiseGroup)}
+          tone={toneClass(entry.result.franchiseGroup)}
+        />
+      </div>
+    </article>
+  );
+}
+
 export default function GamePage({ target, initialGuessIds, initialStatus, onStateChange, onBackHome }) {
   const [inputValue, setInputValue] = useState("");
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -221,31 +276,33 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
             <label htmlFor="guess-input" className="block text-sm font-semibold mb-2">
               Choose your guess
             </label>
-            <input
-              ref={inputRef}
-              id="guess-input"
-              type="text"
-              value={inputValue}
-              onChange={(event) => {
-                const nextValue = event.target.value;
-                setInputValue(nextValue);
-                setOpenDropdown(nextValue.trim().length > 0);
-                setActiveIndex(-1);
-                if (error) setError("");
-              }}
-              onFocus={() => setOpenDropdown(inputValue.trim().length > 0)}
-              onKeyDown={onInputKeyDown}
-              placeholder="Type a character name..."
-              className="w-full rounded-2xl border border-rose-200 bg-white pl-4 pr-28 sm:pr-32 py-3 text-sm sm:text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
-            />
-            <button
-              type="button"
-              onClick={() => submitGuess(inputValue)}
-              disabled={gameOver}
-              className="absolute right-2 top-[38px] sm:top-[36px] rounded-full bg-rose-400 text-black px-3.5 sm:px-4 py-1.5 text-xs sm:text-sm font-bold shadow-sm hover:bg-rose-500 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              Submit
-            </button>
+            <div className="relative">
+              <input
+                ref={inputRef}
+                id="guess-input"
+                type="text"
+                value={inputValue}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  setInputValue(nextValue);
+                  setOpenDropdown(nextValue.trim().length > 0);
+                  setActiveIndex(-1);
+                  if (error) setError("");
+                }}
+                onFocus={() => setOpenDropdown(inputValue.trim().length > 0)}
+                onKeyDown={onInputKeyDown}
+                placeholder="Type a character name..."
+                className="w-full rounded-2xl border border-rose-200 bg-white pl-4 pr-24 sm:pr-32 py-3 text-sm sm:text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
+              />
+              <button
+                type="button"
+                onClick={() => submitGuess(inputValue)}
+                disabled={gameOver}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-rose-400 text-black px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold shadow-sm hover:bg-rose-500 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                Submit
+              </button>
+            </div>
 
             {openDropdown && !gameOver && hasTypedQuery && (
               <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-3xl border border-white/80 bg-gradient-to-b from-white to-rose-50/60 shadow-[0_18px_45px_rgba(255,167,206,0.3)] backdrop-blur-sm">
@@ -285,7 +342,21 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
           {error ? <p className="mt-2 text-sm text-rose-600">{error}</p> : null}
         </section>
 
-        <section className="overflow-x-auto rounded-3xl border border-white bg-white/80 shadow-soft p-2.5 sm:p-4">
+        <section className="md:hidden space-y-3">
+          <div className="rounded-3xl border border-white bg-white/70 shadow-soft p-3">
+            {guesses.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-rose-200 bg-cream px-4 py-6 text-center text-sm text-rose-500">
+                Your guess history will appear here. Start with your cutest guess!
+              </div>
+            ) : (
+              guesses.map((entry, index) => (
+                <MobileGuessCard key={`${entry.character.id}-${index}`} entry={entry} />
+              ))
+            )}
+          </div>
+        </section>
+
+        <section className="hidden md:block overflow-x-auto rounded-3xl border border-white bg-white/80 shadow-soft p-2.5 sm:p-4">
           <div className="min-w-[690px] sm:min-w-[760px] grid grid-cols-6 gap-1.5 sm:gap-2 mb-2 text-[11px] sm:text-xs font-bold uppercase tracking-wide text-rose-500">
             <div className="px-2">Character</div>
             <div className="px-2">Gender</div>
