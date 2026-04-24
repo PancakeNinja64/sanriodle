@@ -28,3 +28,12 @@ body {
 .animate-fade-in {
   animation: fade-in 280ms ease-out both;
 }
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

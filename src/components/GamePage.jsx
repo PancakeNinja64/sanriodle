@@ -62,57 +62,43 @@ function toDisplayLabel(value) {
     .join(" ");
 }
 
-function MobileAttributePill({ label, value, tone, hint }) {
+function MobileCompactTile({ label, value, tone, hint, className = "" }) {
   return (
-    <div className={`rounded-2xl border px-3 py-2 ${tone}`}>
-      <p className="text-[11px] uppercase tracking-wide opacity-80">{label}</p>
-      <p className="text-sm font-semibold leading-tight">
+    <div className={`rounded-xl border px-2.5 py-2 min-h-[62px] ${tone} ${className}`}>
+      <p className="text-[10px] uppercase tracking-wide opacity-80 leading-none">{label}</p>
+      <p className="mt-1 text-xs font-semibold leading-tight">
         {value}
-        {hint ? <span className="ml-1 text-xs font-medium">{hint}</span> : null}
+        {hint ? <span className="ml-1 text-[10px] font-medium">{hint}</span> : null}
       </p>
     </div>
   );
 }
 
-function MobileGuessCard({ entry }) {
+function MobileGuessRow({ entry }) {
   return (
-    <article className="rounded-3xl border border-white bg-white/80 shadow-soft p-3.5 animate-fade-in">
-      <div className={`rounded-2xl border px-3 py-2.5 mb-3 flex items-center gap-2.5 ${toneClass(entry.result.name)}`}>
-        <ImageThumb src={entry.character.image} alt={entry.character.name} size="sm" />
-        <p className="font-semibold text-sm leading-tight">{entry.character.name}</p>
+    <article className="grid grid-cols-[minmax(170px,2fr)_minmax(92px,1fr)_minmax(96px,1fr)_minmax(108px,1fr)_minmax(96px,1fr)_minmax(116px,1.1fr)] gap-2 animate-fade-in">
+      <div className={`rounded-xl border px-2.5 py-2 min-h-[62px] ${toneClass(entry.result.name)}`}>
+        <p className="text-[10px] uppercase tracking-wide opacity-80 leading-none">Character</p>
+        <div className="mt-1 flex items-center gap-2">
+          <ImageThumb src={entry.character.image} alt={entry.character.name} size="sm" />
+          <p className="text-xs font-semibold leading-tight truncate">{entry.character.name}</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2.5">
-        <MobileAttributePill
-          label="Gender"
-          value={toDisplayLabel(entry.character.gender)}
-          tone={toneClass(entry.result.gender)}
-        />
-        <MobileAttributePill
-          label="Species"
-          value={toDisplayLabel(entry.character.species)}
-          tone={toneClass(entry.result.species)}
-        />
-        <MobileAttributePill
-          label="Release Year"
-          value={entry.character.releaseYear}
-          hint={entry.result.releaseHint === "match" ? "" : entry.result.releaseHint === "older" ? "\u2191 newer" : "\u2193 older"}
-          tone={toneClass(entry.result.releaseYear)}
-        />
-        <MobileAttributePill
-          label="Color"
-          value={toDisplayLabel(entry.character.signatureColor)}
-          tone={toneClass(entry.result.signatureColor)}
-        />
-      </div>
-
-      <div className="mt-2.5">
-        <MobileAttributePill
-          label="Franchise"
-          value={toDisplayLabel(entry.character.franchiseGroup)}
-          tone={toneClass(entry.result.franchiseGroup)}
-        />
-      </div>
+      <MobileCompactTile label="Gender" value={toDisplayLabel(entry.character.gender)} tone={toneClass(entry.result.gender)} />
+      <MobileCompactTile label="Species" value={toDisplayLabel(entry.character.species)} tone={toneClass(entry.result.species)} />
+      <MobileCompactTile
+        label="Release Year"
+        value={entry.character.releaseYear}
+        hint={entry.result.releaseHint === "match" ? "" : entry.result.releaseHint === "older" ? "\u2191 newer" : "\u2193 older"}
+        tone={toneClass(entry.result.releaseYear)}
+      />
+      <MobileCompactTile label="Color" value={toDisplayLabel(entry.character.signatureColor)} tone={toneClass(entry.result.signatureColor)} />
+      <MobileCompactTile
+        label="Franchise"
+        value={toDisplayLabel(entry.character.franchiseGroup)}
+        tone={toneClass(entry.result.franchiseGroup)}
+      />
     </article>
   );
 }
@@ -271,7 +257,7 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
           </button>
         </header>
 
-        <section className="rounded-3xl bg-lavender/40 border border-white p-4 sm:p-5 shadow-soft mb-6">
+        <section className="rounded-3xl bg-lavender/40 border border-white p-3 md:p-5 shadow-soft mb-4 md:mb-6">
           <div className="relative" ref={searchAreaRef}>
             <label htmlFor="guess-input" className="block text-sm font-semibold mb-2">
               Choose your guess
@@ -292,13 +278,13 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
                 onFocus={() => setOpenDropdown(inputValue.trim().length > 0)}
                 onKeyDown={onInputKeyDown}
                 placeholder="Type a character name..."
-                className="w-full rounded-2xl border border-rose-200 bg-white pl-4 pr-24 sm:pr-32 py-3 text-sm sm:text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
+                className="w-full rounded-2xl border border-rose-200 bg-white pl-4 pr-24 md:pr-32 py-2.5 md:py-3 text-sm md:text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
               />
               <button
                 type="button"
                 onClick={() => submitGuess(inputValue)}
                 disabled={gameOver}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-rose-400 text-black px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold shadow-sm hover:bg-rose-500 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="absolute right-1.5 md:right-2 top-1/2 -translate-y-1/2 rounded-full bg-rose-400 text-black px-2.5 md:px-4 py-1.5 text-xs md:text-sm font-bold shadow-sm hover:bg-rose-500 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 Submit
               </button>
@@ -330,11 +316,11 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
             )}
           </div>
 
-          <div className="mt-3 flex flex-col sm:flex-row gap-3">
+          <div className="mt-2 md:mt-3 flex flex-col sm:flex-row gap-2 md:gap-3">
             <button
               type="button"
               onClick={onBackHome}
-              className="rounded-full px-5 py-2.5 font-semibold bg-white text-rose-500 border border-rose-200 hover:bg-rose-50 transition-colors"
+              className="rounded-full px-4 md:px-5 py-2 text-sm md:text-base font-medium bg-white/85 text-rose-500 border border-rose-200 hover:bg-rose-50 transition-colors self-start"
             >
               Back Home
             </button>
@@ -342,17 +328,19 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
           {error ? <p className="mt-2 text-sm text-rose-600">{error}</p> : null}
         </section>
 
-        <section className="md:hidden space-y-3">
-          <div className="rounded-3xl border border-white bg-white/70 shadow-soft p-3">
+        <section className="md:hidden rounded-3xl border border-white bg-white/75 shadow-soft p-2.5">
+          <div className="overflow-x-auto hide-scrollbar pb-1">
+            <div className="min-w-[710px] space-y-2">
             {guesses.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-rose-200 bg-cream px-4 py-6 text-center text-sm text-rose-500">
                 Your guess history will appear here. Start with your cutest guess!
               </div>
             ) : (
               guesses.map((entry, index) => (
-                <MobileGuessCard key={`${entry.character.id}-${index}`} entry={entry} />
+                <MobileGuessRow key={`${entry.character.id}-${index}`} entry={entry} />
               ))
             )}
+            </div>
           </div>
         </section>
 
