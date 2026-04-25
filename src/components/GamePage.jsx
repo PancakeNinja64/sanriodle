@@ -35,16 +35,24 @@ function ImageThumb({ src, alt, size = "md" }) {
 
 function compareGuess(guess, target) {
   const exact = (field) => guess[field] === target[field];
-  const releaseDiff = guess.releaseYear - target.releaseYear;
+  const isColorNear = (guessColor, targetPrimary, targetSecondary) =>
+    guessColor !== targetPrimary && guessColor === targetSecondary;
 
   return {
     name: exact("name") ? "exact" : "wrong",
     gender: exact("gender") ? "exact" : "wrong",
     species: exact("species") ? "exact" : "wrong",
-    signatureColor: exact("signatureColor") ? "exact" : "wrong",
+    primaryColor: exact("primaryColor")
+      ? "exact"
+      : isColorNear(guess.primaryColor, target.primaryColor, target.secondaryColor)
+        ? "near"
+        : "wrong",
+    secondaryColor: exact("secondaryColor")
+      ? "exact"
+      : isColorNear(guess.secondaryColor, target.secondaryColor, target.primaryColor)
+        ? "near"
+        : "wrong",
     franchiseGroup: exact("franchiseGroup") ? "exact" : "wrong",
-    releaseYear: releaseDiff === 0 ? "exact" : Math.abs(releaseDiff) <= 5 ? "near" : "wrong",
-    releaseHint: releaseDiff === 0 ? "match" : releaseDiff > 0 ? "newer" : "older",
   };
 }
 
@@ -88,12 +96,15 @@ function MobileGuessRow({ entry }) {
       <MobileCompactTile label="Gender" value={toDisplayLabel(entry.character.gender)} tone={toneClass(entry.result.gender)} />
       <MobileCompactTile label="Species" value={toDisplayLabel(entry.character.species)} tone={toneClass(entry.result.species)} />
       <MobileCompactTile
-        label="Release Year"
-        value={entry.character.releaseYear}
-        hint={entry.result.releaseHint === "match" ? "" : entry.result.releaseHint === "older" ? "\u2191 newer" : "\u2193 older"}
-        tone={toneClass(entry.result.releaseYear)}
+        label="Primary Color"
+        value={toDisplayLabel(entry.character.primaryColor)}
+        tone={toneClass(entry.result.primaryColor)}
       />
-      <MobileCompactTile label="Color" value={toDisplayLabel(entry.character.signatureColor)} tone={toneClass(entry.result.signatureColor)} />
+      <MobileCompactTile
+        label="Secondary Color"
+        value={toDisplayLabel(entry.character.secondaryColor)}
+        tone={toneClass(entry.result.secondaryColor)}
+      />
       <MobileCompactTile
         label="Franchise"
         value={toDisplayLabel(entry.character.franchiseGroup)}
@@ -349,8 +360,8 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
             <div className="px-2">Character</div>
             <div className="px-2">Gender</div>
             <div className="px-2">Species</div>
-            <div className="px-2">Release Year</div>
-            <div className="px-2">Color</div>
+            <div className="px-2">Primary Color</div>
+            <div className="px-2">Secondary Color</div>
             <div className="px-2">Franchise</div>
           </div>
 
@@ -372,14 +383,11 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
                   </div>
                   <div className={`${cellBase} ${toneClass(entry.result.gender)}`}>{toDisplayLabel(entry.character.gender)}</div>
                   <div className={`${cellBase} ${toneClass(entry.result.species)}`}>{toDisplayLabel(entry.character.species)}</div>
-                  <div className={`${cellBase} ${toneClass(entry.result.releaseYear)}`}>
-                    <span className="font-semibold">{entry.character.releaseYear}</span>
-                    {entry.result.releaseHint !== "match" ? (
-                      <span className="ml-1 text-xs">{entry.result.releaseHint === "older" ? "\u2191 newer" : "\u2193 older"}</span>
-                    ) : null}
+                  <div className={`${cellBase} ${toneClass(entry.result.primaryColor)}`}>
+                    {toDisplayLabel(entry.character.primaryColor)}
                   </div>
-                  <div className={`${cellBase} ${toneClass(entry.result.signatureColor)}`}>
-                    {toDisplayLabel(entry.character.signatureColor)}
+                  <div className={`${cellBase} ${toneClass(entry.result.secondaryColor)}`}>
+                    {toDisplayLabel(entry.character.secondaryColor)}
                   </div>
                   <div className={`${cellBase} ${toneClass(entry.result.franchiseGroup)}`}>
                     {toDisplayLabel(entry.character.franchiseGroup)}
@@ -394,8 +402,8 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
           <Modal title="How to Play" onClose={() => setShowHowToPlay(false)}>
             <div className="space-y-2 text-sm text-rose-700 leading-relaxed">
               <p>Guess the daily character in up to {MAX_GUESSES} tries.</p>
-              <p>Mint means exact match, peach means near match (for year), rosy means incorrect.</p>
-              <p>For release year hints: ↑ means the target is newer, ↓ means the target is older.</p>
+              <p>Mint means exact match, peach means close color match, rosy means incorrect.</p>
+              <p>Use gender, species, primary color, secondary color, and franchise clues to narrow it down.</p>
             </div>
           </Modal>
         )}
@@ -422,7 +430,9 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
               </p>
               <div className="flex items-center justify-center gap-3 mb-2">
                 <ImageThumb src={target.image} alt={target.name} />
-                <p className="text-sm text-rose-600">{toDisplayLabel(target.species)} • {target.releaseYear}</p>
+                <p className="text-sm text-rose-600">
+                  {toDisplayLabel(target.species)} • {toDisplayLabel(target.primaryColor)}
+                </p>
               </div>
             </div>
           </Modal>

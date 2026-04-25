@@ -28,7 +28,7 @@ export const SPECIES_VALUES = [
 ] as const;
 export type CharacterSpecies = (typeof SPECIES_VALUES)[number];
 
-export const SIGNATURE_COLOR_VALUES = [
+export const COLOR_VALUES = [
   "pink",
   "blue",
   "yellow",
@@ -43,7 +43,7 @@ export const SIGNATURE_COLOR_VALUES = [
   "mint",
   "purple",
 ] as const;
-export type CharacterSignatureColor = (typeof SIGNATURE_COLOR_VALUES)[number];
+export type CharacterColor = (typeof COLOR_VALUES)[number];
 
 export const FRANCHISE_GROUP_VALUES = [
   "sanrio",

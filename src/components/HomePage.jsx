@@ -27,7 +27,7 @@ export default function HomePage({ dateKey, onPlay }) {
             Sanriodle is a daily guessing game where you try to find the hidden Sanrio character.
           </p>
           <p className="mt-2 text-sm text-rose-600 leading-relaxed">
-            How to Play: Enter a character guess, then use each row of hints for species, color, franchise, and year
+            How to Play: Enter a character guess, then use each row of hints for species, colors, and franchise
             direction to narrow down the answer.
           </p>
 
