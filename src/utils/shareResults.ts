@@ -37,7 +37,7 @@ export function buildShareText({
 
   return [
     getSharePuzzleLabel(dateKey),
-    `Solved in ${solvedIn}/8 guesses 💖`,
+    `Solved in ${solvedIn}/8 guesses 💚`,
     "",
     ...rows,
     "",
