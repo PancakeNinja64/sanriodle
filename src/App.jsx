@@ -51,6 +51,7 @@ export default function App() {
         element={
           <GamePage
             target={target}
+            dateKey={dateKey}
             initialGuessIds={gameState.guessedCharacterIds}
             initialStatus={gameState.status}
             onStateChange={handleStateChange}

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { characters } from "../data/characters.ts";
+import { buildShareText, copyResultsToClipboard, tryNativeShare } from "../utils/shareResults";
 import Modal from "./Modal";
 
 const MAX_GUESSES = 8;
@@ -114,7 +115,7 @@ function MobileGuessRow({ entry }) {
   );
 }
 
-export default function GamePage({ target, initialGuessIds, initialStatus, onStateChange, onBackHome }) {
+export default function GamePage({ target, dateKey, initialGuessIds, initialStatus, onStateChange, onBackHome }) {
   const [inputValue, setInputValue] = useState("");
   const [activeIndex, setActiveIndex] = useState(-1);
   const [openDropdown, setOpenDropdown] = useState(false);
@@ -122,6 +123,8 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showWinModal, setShowWinModal] = useState(false);
   const [showLossModal, setShowLossModal] = useState(false);
+  const [shareFeedback, setShareFeedback] = useState("");
+  const [manualShareText, setManualShareText] = useState("");
 
   const inputRef = useRef(null);
   const searchAreaRef = useRef(null);
@@ -251,6 +254,40 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
       setOpenDropdown(false);
       setActiveIndex(-1);
     }
+  };
+
+  const shareText = useMemo(() => {
+    const resultRows = guesses.map((guess) => ({
+      gender: guess.result.gender,
+      species: guess.result.species,
+      primaryColor: guess.result.primaryColor,
+      secondaryColor: guess.result.secondaryColor,
+      franchiseGroup: guess.result.franchiseGroup,
+    }));
+    return buildShareText({
+      dateKey,
+      solvedIn: guesses.length,
+      resultRows,
+    });
+  }, [dateKey, guesses]);
+
+  const handleShareResults = async () => {
+    const copied = await copyResultsToClipboard(shareText);
+    if (copied) {
+      setShareFeedback("Copied to clipboard!");
+      setManualShareText("");
+      return;
+    }
+
+    const shared = await tryNativeShare(shareText);
+    if (shared) {
+      setShareFeedback("Shared successfully!");
+      setManualShareText("");
+      return;
+    }
+
+    setShareFeedback("Couldn’t copy automatically. Copy manually below.");
+    setManualShareText(shareText);
   };
 
   return (
@@ -398,6 +435,25 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
           </div>
         </section>
 
+        {gameWon && (
+          <section className="mt-3 rounded-3xl border border-rose-100 bg-gradient-to-r from-white via-rose-50 to-lavender/40 shadow-soft p-3.5 sm:p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-black-700">Share your result</p>
+                <p className="text-xs sm:text-sm text-black-600">Copy and post your daily Sanriodle run.</p>
+              </div>
+              <button
+                type="button"
+                onClick={handleShareResults}
+                className="rounded-full px-5 py-2.5 text-sm sm:text-base font-extrabold bg-rose-500 text-black border border-rose-400 shadow-sm hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-300 active:scale-[0.99] transition"
+              >
+                Share Results
+              </button>
+            </div>
+            {shareFeedback ? <p className="mt-2 text-sm text-black-700">{shareFeedback}</p> : null}
+          </section>
+        )}
+
         {showHowToPlay && (
           <Modal title="How to Play" onClose={() => setShowHowToPlay(false)}>
             <div className="space-y-2 text-sm text-rose-700 leading-relaxed">
@@ -417,6 +473,14 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
                 <ImageThumb src={target.image} alt={target.name} />
                 <p className="font-bold text-rose-600">{target.name}</p>
               </div>
+              <button
+                type="button"
+                onClick={handleShareResults}
+                className="mt-3 rounded-full px-5 py-2.5 text-sm font-extrabold bg-rose-500 text-black border border-rose-400 shadow-sm hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-300 active:scale-[0.99] transition"
+              >
+                Share Results
+              </button>
+              {shareFeedback ? <p className="mt-2 text-sm text-rose-700">{shareFeedback}</p> : null}
             </div>
           </Modal>
         )}
@@ -435,6 +499,17 @@ export default function GamePage({ target, initialGuessIds, initialStatus, onSta
                 </p>
               </div>
             </div>
+          </Modal>
+        )}
+
+        {manualShareText && (
+          <Modal title="Copy Share Text" onClose={() => setManualShareText("")} maxWidthClass="max-w-lg">
+            <p className="text-sm text-rose-700 mb-2">Clipboard access failed. Copy this text manually:</p>
+            <textarea
+              readOnly
+              value={manualShareText}
+              className="w-full min-h-56 rounded-2xl border border-rose-200 bg-rose-50/60 p-3 text-sm text-rose-800"
+            />
           </Modal>
         )}
       </div>
