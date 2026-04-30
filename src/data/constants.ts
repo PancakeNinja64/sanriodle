@@ -42,6 +42,7 @@ export const COLOR_VALUES = [
   "brown",
   "mint",
   "purple",
+  "beige",
 ] as const;
 export type CharacterColor = (typeof COLOR_VALUES)[number];
 
